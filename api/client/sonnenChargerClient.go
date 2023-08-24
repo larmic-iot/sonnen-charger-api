@@ -53,6 +53,6 @@ func (c *ChargerClient) readRegister(registerAddress uint16, registerName string
 		return make([]uint16, 0)
 	}
 
-	fmt.Printf("[%d] %s: %s \n", registerAddress, registerName, register)
+	fmt.Printf("[%d] %s: %d \n", registerAddress, registerName, register)
 	return register
 }

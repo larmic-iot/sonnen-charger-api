@@ -42,11 +42,11 @@ func (c *ChargerClient) ReadConnector(number int) Connector {
 	}
 }
 
-func (c *ChargerClient) readConnectorType(number int) ConnectorType {
+func (c *ChargerClient) readConnectorType(connectorNumber int) ConnectorType {
 	_ = c.client.Open()
 
-	registerAddress := uint16(ChargerConnectorBaseAddress + (number-1)*100)
-	register := c.readRegister(registerAddress, "Connector number "+strconv.Itoa(number), 1)
+	registerAddress := uint16(ChargerConnectorBaseAddress + +getConnectorOffset(connectorNumber))
+	register := c.readRegister(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1)
 
 	_ = c.client.Close()
 
@@ -63,13 +63,17 @@ func (c *ChargerClient) readConnectorType(number int) ConnectorType {
 	return connectorType
 }
 
-func (c *ChargerClient) readNumberOfPhases(number int) int {
+func (c *ChargerClient) readNumberOfPhases(connectorNumber int) int {
 	_ = c.client.Open()
 
-	registerAddress := uint16(ChargerConnectorPhaseAddress + (number-1)*100)
-	register := c.readRegister(registerAddress, "Number of phases "+strconv.Itoa(number), 1)
+	registerAddress := uint16(ChargerConnectorPhaseAddress + getConnectorOffset(connectorNumber))
+	register := c.readRegister(registerAddress, "Number of phases "+strconv.Itoa(connectorNumber), 1)
 
 	_ = c.client.Close()
 
 	return int(register[0])
+}
+
+func getConnectorOffset(connectorNumber int) int {
+	return (connectorNumber - 1) * 100
 }

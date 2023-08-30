@@ -1,7 +1,9 @@
 package client
 
 import (
+	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -12,6 +14,7 @@ const (
 	ChargerConnectorL1Address    = 1024
 	ChargerConnectorL2Address    = 1025
 	ChargerConnectorL3Address    = 1026
+	ChargerConnectorMaxCurrent   = 1028
 )
 
 type ConnectorType string
@@ -29,9 +32,10 @@ type ConnectorPhases struct {
 }
 
 type Connector struct {
-	Type           ConnectorType
-	NumberOfPhases int
-	Phases         ConnectorPhases
+	Type               ConnectorType
+	NumberOfPhases     int
+	Phases             ConnectorPhases
+	MaxCurrentInAmpere int
 }
 
 func (c *ChargerClient) ReadNumberOfConnectors() int {
@@ -47,9 +51,10 @@ func (c *ChargerClient) ReadNumberOfConnectors() int {
 
 func (c *ChargerClient) ReadConnector(number int) Connector {
 	return Connector{
-		Type:           c.readConnectorType(number),
-		NumberOfPhases: c.readNumberOfPhases(number),
-		Phases:         c.readConnectorPhases(number),
+		Type:               c.readConnectorType(number),
+		NumberOfPhases:     c.readNumberOfPhases(number),
+		Phases:             c.readConnectorPhases(number),
+		MaxCurrentInAmpere: c.readConnectorMaxInA(number),
 	}
 }
 
@@ -104,6 +109,20 @@ func (c *ChargerClient) readConnectorPhases(connectorNumber int) ConnectorPhases
 		L2: int(registerL2[0]),
 		L3: int(registerL3[0]),
 	}
+}
+
+func (c *ChargerClient) readConnectorMaxInA(connectorNumber int) int {
+	_ = c.client.Open()
+
+	registerAddress := uint16(ChargerConnectorMaxCurrent + getConnectorOffset(connectorNumber))
+	register := c.readBytes(registerAddress, "Max current in ampere of connector "+strconv.Itoa(connectorNumber), 2)
+
+	_ = c.client.Close()
+
+	cMaxCurrent := binary.BigEndian.Uint32(register)
+	fcMaxCurrent := math.Float32frombits(cMaxCurrent)
+
+	return int(fcMaxCurrent)
 }
 
 func getConnectorOffset(connectorNumber int) int {

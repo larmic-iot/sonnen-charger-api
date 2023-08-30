@@ -11,4 +11,6 @@ func main() {
 	fmt.Println(c.ReadSettings())
 	fmt.Println(c.ReadNumberOfConnectors())
 	fmt.Println(c.ReadConnector(1))
+	// Read unknown connector for testing
+	fmt.Println(c.ReadConnector(2))
 }

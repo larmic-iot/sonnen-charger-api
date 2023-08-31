@@ -57,13 +57,13 @@ func (c *ChargerClient) ReadConnector(number int) Connector {
 
 func (c *ChargerClient) readConnectorType(connectorNumber int) ConnectorType {
 	registerAddress := uint16(ChargerConnectorBaseAddress + getConnectorOffset(connectorNumber))
-	register := c.readBytes(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1)
+	register := c.readBytes(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1, true)
 
 	var connectorType ConnectorType
 
-	if register[1] == 1 {
+	if register[0] == 1 {
 		connectorType = SocketType2
-	} else if register[1] == 2 {
+	} else if register[0] == 2 {
 		connectorType = CableType2
 	} else {
 		connectorType = Unknown
@@ -98,7 +98,7 @@ func (c *ChargerClient) readConnectorPhases(connectorNumber int) ConnectorPhases
 
 func (c *ChargerClient) readConnectorMaxInA(connectorNumber int) int {
 	registerAddress := uint16(ChargerConnectorMaxCurrent + getConnectorOffset(connectorNumber))
-	register := c.readBytes(registerAddress, "Max current in ampere of connector "+strconv.Itoa(connectorNumber), 2)
+	register := c.readBytes(registerAddress, "Max current in ampere of connector "+strconv.Itoa(connectorNumber), 2, false)
 
 	cMaxCurrent := binary.BigEndian.Uint32(register)
 	fcMaxCurrent := math.Float32frombits(cMaxCurrent)

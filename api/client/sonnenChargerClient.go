@@ -2,8 +2,8 @@ package client
 
 import (
 	"bytes"
-	"fmt"
 	modbus2 "github.com/goburrow/modbus"
+	"log"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func NewClient(ip string) *ChargerClient {
 	defer handler.Close()
 
 	if err != nil {
-		fmt.Println("Generic error", err)
+		log.Println("Generic error", err)
 		return nil
 	}
 
@@ -37,7 +37,7 @@ func (c *ChargerClient) readBytesAsString(registerAddress uint16, registerName s
 	results, err := client.ReadInputRegisters(registerAddress, quantity)
 
 	if err != nil {
-		fmt.Printf("[%d] %s: failed with error '%s' \n", registerAddress, registerName, err)
+		log.Printf("[%d] %s: failed with error '%s'", registerAddress, registerName, err)
 		return ""
 	}
 
@@ -45,20 +45,26 @@ func (c *ChargerClient) readBytesAsString(registerAddress uint16, registerName s
 	n := bytes.Index(results[:], []byte{0})
 	value := results[:n]
 
-	fmt.Printf("[%d] %s: %s \n", registerAddress, registerName, value)
+	log.Printf("[%d] %s: %s", registerAddress, registerName, results)
 	return string(value)
 }
 
-func (c *ChargerClient) readBytes(registerAddress uint16, registerName string, quantity uint16) []byte {
+func (c *ChargerClient) readBytes(registerAddress uint16, registerName string, quantity uint16, removeZeroByte bool) []byte {
 	client := modbus2.NewClient(c.modbusHandler)
 	results, err := client.ReadInputRegisters(registerAddress, quantity)
 
 	if err != nil {
-		fmt.Printf("[%d] %s: failed with error '%s' \n", registerAddress, registerName, err)
-		return []byte("")
+		log.Printf("[%d] %s: failed with error '%s'", registerAddress, registerName, err)
+		return []byte(nil)
 	}
 
-	fmt.Printf("[%d] %s: %s \n", registerAddress, registerName, results)
+	if removeZeroByte {
+		var nonZeroBytes = removeZeroBytes(results)
+		log.Printf("[%d] %s: %s", registerAddress, registerName, nonZeroBytes)
+		return nonZeroBytes
+	}
+
+	log.Printf("[%d] %s: %s", registerAddress, registerName, results)
 	return results
 }
 
@@ -67,12 +73,20 @@ func (c *ChargerClient) readRegister(registerAddress uint16, registerName string
 	results, err := client.ReadInputRegisters(registerAddress, quantity)
 
 	if err != nil {
-		fmt.Printf("[%d] %s: failed with error '%s' \n", registerAddress, registerName, err)
+		log.Printf("[%d] %s: failed with error '%s'", registerAddress, registerName, err)
 		return []byte{0}
 	}
 
+	var nonZeroBytes = removeZeroBytes(results)
+
+	log.Printf("[%d] %s: %s", registerAddress, registerName, nonZeroBytes)
+	return nonZeroBytes
+}
+
+// remove all zero bytes from array and add at least one zero if array is empty
+func removeZeroBytes(value []byte) []byte {
 	var nonZeroBytes []byte
-	for _, value := range results {
+	for _, value := range value {
 		if value != 0 {
 			nonZeroBytes = append(nonZeroBytes, value)
 		}
@@ -82,6 +96,5 @@ func (c *ChargerClient) readRegister(registerAddress uint16, registerName string
 		return []byte{0}
 	}
 
-	fmt.Printf("[%d] %s: %d \n", registerAddress, registerName, nonZeroBytes)
 	return nonZeroBytes
 }

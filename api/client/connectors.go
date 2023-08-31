@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	ChargerConnectorStatus       = 0
 	ChargerConnectorsNumber      = 1020
 	ChargerConnectorBaseAddress  = 1022
 	ChargerConnectorPhaseAddress = 1023
@@ -18,11 +19,26 @@ const (
 )
 
 type ConnectorType string
+type ConnectorStatus string
 
 const (
 	SocketType2 ConnectorType = "SocketType2"
 	CableType2                = "CableType2"
 	Unknown                   = "Unknown"
+)
+
+const (
+	Available                  ConnectorStatus = "Available"
+	ConnectTheCable                            = "Connect the cable"
+	WaitingForVehicleToRespond                 = "Waiting for vehicle to respond"
+	Charging                                   = "Charging"
+	VehicleHasPausedCharging                   = "Vehicle has paused charging"
+	EVSEHasPausedCharging                      = "EVSE has paused charging"
+	ChargingHasBeeEnded                        = "Charging has been ended"
+	ChargingFault                              = "Charging fault"
+	UnpausingCharging                          = "Unpausing charging"
+	Unavailable                                = "Unavailable"
+	UnknownStatus                              = "Unknown"
 )
 
 type ConnectorPhases struct {
@@ -33,6 +49,7 @@ type ConnectorPhases struct {
 
 type Connector struct {
 	Type               ConnectorType
+	Status             ConnectorStatus
 	NumberOfPhases     int
 	Phases             ConnectorPhases
 	MaxCurrentInAmpere int
@@ -47,8 +64,11 @@ func (c *ChargerClient) ReadNumberOfConnectors() int {
 }
 
 func (c *ChargerClient) ReadConnector(number int) Connector {
+	c.readConnectorStatus(number)
+
 	return Connector{
 		Type:               c.readConnectorType(number),
+		Status:             c.readConnectorStatus(number),
 		NumberOfPhases:     c.readNumberOfPhases(number),
 		Phases:             c.readConnectorPhases(number),
 		MaxCurrentInAmpere: c.readConnectorMaxInA(number),
@@ -104,6 +124,39 @@ func (c *ChargerClient) readConnectorMaxInA(connectorNumber int) int {
 	fcMaxCurrent := math.Float32frombits(cMaxCurrent)
 
 	return int(fcMaxCurrent)
+}
+
+func (c *ChargerClient) readConnectorStatus(connectorNumber int) ConnectorStatus {
+	registerAddress := uint16(ChargerConnectorStatus + getConnectorOffset(connectorNumber))
+	register := c.readBytes(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1, true)
+
+	var status ConnectorStatus
+
+	if register[0] == 1 {
+		status = Available
+	} else if register[0] == 2 {
+		status = ConnectTheCable
+	} else if register[0] == 3 {
+		status = WaitingForVehicleToRespond
+	} else if register[0] == 4 {
+		status = Charging
+	} else if register[0] == 5 {
+		status = VehicleHasPausedCharging
+	} else if register[0] == 6 {
+		status = EVSEHasPausedCharging
+	} else if register[0] == 7 {
+		status = ChargingHasBeeEnded
+	} else if register[0] == 8 {
+		status = ChargingFault
+	} else if register[0] == 9 {
+		status = UnpausingCharging
+	} else if register[0] == 10 {
+		status = Unavailable
+	} else {
+		status = UnknownStatus
+	}
+
+	return status
 }
 
 func getConnectorOffset(connectorNumber int) int {

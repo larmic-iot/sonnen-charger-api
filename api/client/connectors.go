@@ -40,11 +40,8 @@ type Connector struct {
 
 func (c *ChargerClient) ReadNumberOfConnectors() int {
 	fmt.Println("### Reading charger connectors...")
-	_ = c.client.Open()
 
-	register := c.readRegister(ChargerConnectorsNumber, "Number of connectors", 1)
-
-	_ = c.client.Close()
+	register := c.readRegister(ChargerConnectorsNumber, "Number of connectors", 2)
 
 	return int(register[0])
 }
@@ -59,18 +56,14 @@ func (c *ChargerClient) ReadConnector(number int) Connector {
 }
 
 func (c *ChargerClient) readConnectorType(connectorNumber int) ConnectorType {
-	_ = c.client.Open()
-
-	registerAddress := uint16(ChargerConnectorBaseAddress + +getConnectorOffset(connectorNumber))
-	register := c.readRegister(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1)
-
-	_ = c.client.Close()
+	registerAddress := uint16(ChargerConnectorBaseAddress + getConnectorOffset(connectorNumber))
+	register := c.readBytes(registerAddress, "Connector number "+strconv.Itoa(connectorNumber), 1)
 
 	var connectorType ConnectorType
 
-	if register[0] == 1 {
+	if register[1] == 1 {
 		connectorType = SocketType2
-	} else if register[0] == 2 {
+	} else if register[1] == 2 {
 		connectorType = CableType2
 	} else {
 		connectorType = Unknown
@@ -80,19 +73,13 @@ func (c *ChargerClient) readConnectorType(connectorNumber int) ConnectorType {
 }
 
 func (c *ChargerClient) readNumberOfPhases(connectorNumber int) int {
-	_ = c.client.Open()
-
 	registerAddress := uint16(ChargerConnectorPhaseAddress + getConnectorOffset(connectorNumber))
 	register := c.readRegister(registerAddress, "Number of phases of connector "+strconv.Itoa(connectorNumber), 1)
-
-	_ = c.client.Close()
 
 	return int(register[0])
 }
 
 func (c *ChargerClient) readConnectorPhases(connectorNumber int) ConnectorPhases {
-	_ = c.client.Open()
-
 	registerAddressL1 := uint16(ChargerConnectorL1Address + getConnectorOffset(connectorNumber))
 	registerL1 := c.readRegister(registerAddressL1, "L1 connected phase of connector "+strconv.Itoa(connectorNumber), 1)
 
@@ -102,8 +89,6 @@ func (c *ChargerClient) readConnectorPhases(connectorNumber int) ConnectorPhases
 	registerAddressL3 := uint16(ChargerConnectorL3Address + getConnectorOffset(connectorNumber))
 	registerL3 := c.readRegister(registerAddressL3, "L3 connected phase of connector "+strconv.Itoa(connectorNumber), 1)
 
-	_ = c.client.Close()
-
 	return ConnectorPhases{
 		L1: int(registerL1[0]),
 		L2: int(registerL2[0]),
@@ -112,12 +97,8 @@ func (c *ChargerClient) readConnectorPhases(connectorNumber int) ConnectorPhases
 }
 
 func (c *ChargerClient) readConnectorMaxInA(connectorNumber int) int {
-	_ = c.client.Open()
-
 	registerAddress := uint16(ChargerConnectorMaxCurrent + getConnectorOffset(connectorNumber))
 	register := c.readBytes(registerAddress, "Max current in ampere of connector "+strconv.Itoa(connectorNumber), 2)
-
-	_ = c.client.Close()
 
 	cMaxCurrent := binary.BigEndian.Uint32(register)
 	fcMaxCurrent := math.Float32frombits(cMaxCurrent)

@@ -18,14 +18,11 @@ type ChargerSettings struct {
 
 func (c *ChargerClient) ReadSettings() ChargerSettings {
 	fmt.Println("### Reading charger settings...")
-	_ = c.client.Open()
 
 	serialNumber := c.readBytesAsString(ChargerSettingsSerialNumber, "Serial Number", 10)
 	model := c.readBytesAsString(ChargerSettingsModel, "Model", 20)
 	hwVersion := c.readBytesAsString(ChargerSettingsHwVersion, "HW version", 10)
 	swVersion := c.readBytesAsString(ChargerSettingsSwVersion, "SW version", 10)
-
-	_ = c.client.Close()
 
 	return ChargerSettings{
 		SerialNumber: serialNumber,

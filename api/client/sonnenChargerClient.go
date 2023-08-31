@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	modbus2 "github.com/goburrow/modbus"
-	"github.com/simonvetter/modbus"
 	"time"
 )
 
 type ChargerClient struct {
 	Ip            string
-	client        *modbus.ModbusClient
 	modbusHandler *modbus2.TCPClientHandler
 }
 
@@ -23,11 +21,6 @@ func NewClient(ip string) *ChargerClient {
 	err := handler.Connect()
 	defer handler.Close()
 
-	client, err := modbus.NewClient(&modbus.ClientConfiguration{
-		URL:     "tcp://" + ip + ":502",
-		Timeout: 1 * time.Second,
-	})
-
 	if err != nil {
 		fmt.Println("Generic error", err)
 		return nil
@@ -35,7 +28,6 @@ func NewClient(ip string) *ChargerClient {
 
 	return &ChargerClient{
 		Ip:            ip,
-		client:        client,
 		modbusHandler: handler,
 	}
 }
@@ -70,14 +62,26 @@ func (c *ChargerClient) readBytes(registerAddress uint16, registerName string, q
 	return results
 }
 
-func (c *ChargerClient) readRegister(registerAddress uint16, registerName string, quantity uint16) []uint16 {
-	register, err := c.client.ReadRegisters(registerAddress, quantity, modbus.INPUT_REGISTER)
+func (c *ChargerClient) readRegister(registerAddress uint16, registerName string, quantity uint16) []byte {
+	client := modbus2.NewClient(c.modbusHandler)
+	results, err := client.ReadInputRegisters(registerAddress, quantity)
 
 	if err != nil {
 		fmt.Printf("[%d] %s: failed with error '%s' \n", registerAddress, registerName, err)
-		return make([]uint16, 0)
+		return []byte{0}
 	}
 
-	fmt.Printf("[%d] %s: %d \n", registerAddress, registerName, register)
-	return register
+	var nonZeroBytes []byte
+	for _, value := range results {
+		if value != 0 {
+			nonZeroBytes = append(nonZeroBytes, value)
+		}
+	}
+
+	if nonZeroBytes == nil {
+		return []byte{0}
+	}
+
+	fmt.Printf("[%d] %s: %d \n", registerAddress, registerName, nonZeroBytes)
+	return nonZeroBytes
 }

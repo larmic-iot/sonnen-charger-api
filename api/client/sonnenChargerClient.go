@@ -5,8 +5,6 @@ import (
 	"fmt"
 	modbus2 "github.com/goburrow/modbus"
 	"github.com/simonvetter/modbus"
-	"log"
-	"os"
 	"time"
 )
 
@@ -20,7 +18,7 @@ func NewClient(ip string) *ChargerClient {
 	handler := modbus2.NewTCPClientHandler(ip + ":502")
 	handler.Timeout = 10 * time.Second
 	handler.SlaveId = 0xFF
-	handler.Logger = log.New(os.Stdout, "test: ", log.LstdFlags)
+	//handler.Logger = log.New(os.Stdout, "test: ", log.LstdFlags)
 	// Connect manually so that multiple requests are handled in one connection session
 	err := handler.Connect()
 	defer handler.Close()
@@ -43,7 +41,8 @@ func NewClient(ip string) *ChargerClient {
 }
 
 func (c *ChargerClient) readBytesAsString(registerAddress uint16, registerName string, quantity uint16) string {
-	register, err := c.client.ReadBytes(registerAddress, quantity, modbus.INPUT_REGISTER)
+	client := modbus2.NewClient(c.modbusHandler)
+	results, err := client.ReadInputRegisters(registerAddress, quantity)
 
 	if err != nil {
 		fmt.Printf("[%d] %s: failed with error '%s' \n", registerAddress, registerName, err)
@@ -51,16 +50,14 @@ func (c *ChargerClient) readBytesAsString(registerAddress uint16, registerName s
 	}
 
 	// remove 0 bytes
-	n := bytes.Index(register[:], []byte{0})
-	value := register[:n]
+	n := bytes.Index(results[:], []byte{0})
+	value := results[:n]
 
 	fmt.Printf("[%d] %s: %s \n", registerAddress, registerName, value)
 	return string(value)
 }
 
 func (c *ChargerClient) readBytes(registerAddress uint16, registerName string, quantity uint16) []byte {
-	//register, err := c.client.ReadBytes(registerAddress, quantity, modbus.INPUT_REGISTER)
-
 	client := modbus2.NewClient(c.modbusHandler)
 	results, err := client.ReadInputRegisters(registerAddress, quantity)
 

@@ -9,7 +9,8 @@ RUN go version
 WORKDIR /go/src/larmic/
 
 COPY main.go go.mod go.sum /go/src/larmic/
-COPY api /go/src/larmic/api
+COPY client /go/src/larmic/client
+COPY routers /go/src/larmic/routers
 COPY open-api-3.yaml /go/src/larmic
 
 RUN go mod download

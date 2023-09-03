@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"larmic/sonnen-charger-api/api/client"
+	"larmic/sonnen-charger-api/client"
+	"larmic/sonnen-charger-api/routers"
 )
 
 func main() {
@@ -13,4 +14,8 @@ func main() {
 	fmt.Println(c.ReadConnector(1))
 	// Read unknown connector for testing
 	fmt.Println(c.ReadConnector(2))
+
+	routersInit := routers.InitRouter()
+
+	_ = routersInit.Run()
 }

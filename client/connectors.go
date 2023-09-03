@@ -64,8 +64,6 @@ func (c *ChargerClient) ReadNumberOfConnectors() int {
 }
 
 func (c *ChargerClient) ReadConnector(number int) Connector {
-	c.readConnectorStatus(number)
-
 	return Connector{
 		Type:               c.readConnectorType(number),
 		Status:             c.readConnectorStatus(number),

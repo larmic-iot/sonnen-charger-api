@@ -14,7 +14,13 @@ the REST api of the charger. So this app is using
 REST endpoints documented in [open api 3.1](api/open-api-3.yaml).
 
 This project inspired by [tp-link-hs110-api written in go](https://github.com/larmic/tp-link-hs110-api) and
-improves my Go knowledge.
+improves my Go knowledge. Project layout is based on 
+[golang-standards](https://github.com/golang-standards/project-layout).
+
+## Other sonnen charger api using modbus projects
+* https://github.com/RustyDust/sonnen-charger
+* https://github.com/abauske/sonnen_charger_modbus
+* https://github.com/ChrisWbb/ioBroker.sonnen-charger
 
 ## Versioning
 

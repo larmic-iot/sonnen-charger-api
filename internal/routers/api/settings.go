@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"larmic/sonnen-charger-api/client"
+	"larmic/sonnen-charger-api/internal/client"
 	"net/http"
 )
 

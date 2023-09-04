@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	api2 "larmic/sonnen-charger-api/routers/api"
+	api2 "larmic/sonnen-charger-api/internal/routers/api"
 )
 
 func InitRouter() *gin.Engine {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"larmic/sonnen-charger-api/client"
-	"larmic/sonnen-charger-api/routers"
+	"larmic/sonnen-charger-api/internal/client"
+	"larmic/sonnen-charger-api/internal/routers"
 )
 
 func main() {

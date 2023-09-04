@@ -1,21 +1,29 @@
 package main
 
 import (
-	"fmt"
-	"larmic/sonnen-charger-api/internal/client"
 	"larmic/sonnen-charger-api/internal/routers"
+	"log"
+	"os"
 )
 
 func main() {
-	c := client.NewClient("10.0.40.200")
+	log.Println("Hello sonnen-charger-api!")
 
-	fmt.Println(c.ReadSettings())
-	fmt.Println(c.ReadNumberOfConnectors())
-	fmt.Println(c.ReadConnector(1))
-	// Read unknown connector for testing
-	fmt.Println(c.ReadConnector(2))
+	ip := os.Getenv("SONNEN_CHARGER_IP")
 
-	routersInit := routers.InitRouter()
+	if ip == "" {
+		log.Fatal("Environment variable SONNEN_CHARGER_IP is not set!")
+	}
+
+	//c := client.NewClient(ip)
+	//
+	//fmt.Println(c.ReadSettings())
+	//fmt.Println(c.ReadNumberOfConnectors())
+	//fmt.Println(c.ReadConnector(1))
+	//// Read unknown connector for testing
+	//fmt.Println(c.ReadConnector(2))
+
+	routersInit := routers.InitRouter(ip)
 
 	_ = routersInit.Run()
 }

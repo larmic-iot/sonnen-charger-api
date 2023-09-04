@@ -14,17 +14,20 @@ type chargerSettingsDto struct {
 	Connectors   int    `json:"numberOfConnectors"`
 }
 
-func GetSettings(c *gin.Context) {
-	charger := client.NewClient("10.0.40.200")
+func GetSettings(chargerIp string) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		charger := client.NewClient(chargerIp)
 
-	settings := charger.ReadSettings()
-	connectors := charger.ReadNumberOfConnectors()
+		settings := charger.ReadSettings()
+		connectors := charger.ReadNumberOfConnectors()
 
-	c.IndentedJSON(http.StatusOK, chargerSettingsDto{
-		SerialNumber: settings.SerialNumber,
-		Model:        settings.Model,
-		HWVersion:    settings.HWVersion,
-		SWVersion:    settings.SWVersion,
-		Connectors:   connectors,
-	})
+		c.IndentedJSON(http.StatusOK, chargerSettingsDto{
+			SerialNumber: settings.SerialNumber,
+			Model:        settings.Model,
+			HWVersion:    settings.HWVersion,
+			SWVersion:    settings.SWVersion,
+			Connectors:   connectors,
+		})
+	}
+	return gin.HandlerFunc(fn)
 }

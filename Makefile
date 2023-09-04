@@ -2,6 +2,8 @@ CONTAINER_NAME=larmic-sonnen-charger-api
 IMAGE_NAME=larmic/sonnen-charger-api
 IMAGE_TAG=latest
 
+SONNEN_CHARGER_IP=10.0.40.200
+
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
@@ -17,7 +19,7 @@ docker-build: ## Builds docker image including automated tests
 ## —— Run application 🏃🏽————————————————————————————————————————————————————————————————————————————————————————
 docker-run: ## Runs docker container
 	@echo "Run docker container"
-	docker run -d -p 8080:8080 --rm --name ${CONTAINER_NAME} ${IMAGE_NAME}
+	docker run -d -p 8080:8080 --rm -e SONNEN_CHARGER_IP=${SONNEN_CHARGER_IP} --name ${CONTAINER_NAME} ${IMAGE_NAME}
 
 docker-logs: ## Prints logs of running container
 	@echo "Logging..."

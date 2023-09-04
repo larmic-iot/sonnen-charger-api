@@ -10,7 +10,7 @@ WORKDIR /go/src/larmic/
 
 COPY main.go go.mod go.sum /go/src/larmic/
 COPY internal /go/src/larmic/internal
-COPY open-api-3.yaml /go/src/larmic
+COPY api/open-api-3.yaml /go/src/larmic
 
 RUN go mod download
 

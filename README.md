@@ -1,4 +1,4 @@
-# sonnenBatterie-api
+# sonnen-charger-api
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go build](https://github.com/larmic-iot/sonnen-charger-api/actions/workflows/go-build.yml/badge.svg)](https://github.com/larmic-iot/sonnen-charger-api/actions/workflows/go-build.yml)

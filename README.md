@@ -8,10 +8,9 @@
 
 *NOTE* this application is still in development and a very early version.
 
-A REST api client (adapter) for the [sonnenCharger](https://sonnen.de/ladestation-elektroauto/). Sonnen does not suppoert
+A REST api client (adapter) for the [sonnenCharger](https://sonnen.de/ladestation-elektroauto/). Sonnen does not support
 the REST api of the charger. So this app is using 
-[Modbus](https://en.wikipedia.org/wiki/Modbus#:~:text=Modbus%20TCP%2FIP%20or%20Modbus,layers%20already%20provide%20checksum%20protection)
-REST endpoints documented in [open api 3.1](api/open-api-3.yaml).
+[Modbus](https://en.wikipedia.org/wiki/Modbus#:~:text=Modbus%20TCP%2FIP%20or%20Modbus,layers%20already%20provide%20checksum%20protection). REST endpoints documented in [open api 3.1](api/open-api-3.yaml).
 
 This project inspired by [tp-link-hs110-api written in go](https://github.com/larmic/tp-link-hs110-api) and
 improves my Go knowledge. Project layout is based on 

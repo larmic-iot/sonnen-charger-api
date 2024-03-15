@@ -29,5 +29,5 @@ func GetSettings(chargerIp string) gin.HandlerFunc {
 			Connectors:   connectors,
 		})
 	}
-	return gin.HandlerFunc(fn)
+	return fn
 }

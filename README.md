@@ -45,8 +45,8 @@ $ docker run -d -p 8080:8080 --rm \
 See [open api 3 specification](api/open-api-3.yaml) for further information.
 
 ```sh 
-$ curl http://localhost:8080/api             # Open Api 3.1 specification
-$ curl http://localhost:8080/api/settings    # Charger settings
+$ curl http://localhost:8080/sonnen-charger-api             # Open Api 3.1 specification
+$ curl http://localhost:8080/sonnen-charger-api/settings    # Charger settings
 ```
 
 ## Build application by yourself

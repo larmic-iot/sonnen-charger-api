@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	api2 "larmic/sonnen-charger-api/internal/routers/handlers"
+	"larmic/sonnen-charger-api/internal/routers/handlers"
 )
 
 func InitRouter(chargerIp string) *gin.Engine {
@@ -10,11 +10,11 @@ func InitRouter(chargerIp string) *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	r.GET("/", api2.GetOpenApi)
+	r.GET("/", handlers.GetOpenApi)
 
-	api := r.Group("/api")
-	api.GET("/settings", api2.GetSettings(chargerIp))
-	api.GET("/", api2.GetOpenApi)
+	api := r.Group("/sonnen-charger-api")
+	api.GET("/settings", handlers.GetSettings(chargerIp))
+	api.GET("/", handlers.GetOpenApi)
 
 	return r
 }
